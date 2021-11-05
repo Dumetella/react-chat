@@ -7,14 +7,6 @@ import { Server } from 'http';
 
 async function main(): Promise<void> {
     config.check();
-
-    const MOCK_DATA = {
-        'type': 'SET_DATA',
-        'room': 'TEST',
-        'users': ['Aboba', 'Foo', 'Bar'],
-        'messages': ['Dota2', 'The Best', 'Game ever']
-    };
-
     Logger.configure('./logger_config.json');
     const logger = Logger.getLogger('main');
 
@@ -39,26 +31,7 @@ async function main(): Promise<void> {
 
 
         socket.on('message', (message) => {
-
-            const abobus = JSON.parse(message.toString());
-
-            switch (abobus.type) {
-                case 'LOGIN_REQUEST':
-                    socket.send('LOGIN_ACCEPTED');
-                    break;
-                case 'SET_DATA':
-                    socket.send(JSON.stringify(MOCK_DATA));
-                    break;
-                case 'SET_USERS':
-                    socket.send(JSON.stringify(MOCK_DATA.users));
-                    break;
-                case 'NEW_MESSAGE':
-                    socket.send(JSON.stringify(MOCK_DATA));
-                    break;
-                default:
-                    socket.send('Incorrect request?');
-                    break;
-            }
+            logger.info('Ok');
         });
     });
 

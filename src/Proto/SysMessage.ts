@@ -1,4 +1,5 @@
-import { Room } from '../Model/Room';
+import ChatRoom from './Model/ChatRoom';
+
 
 //cl -> sv
 interface LoginRequestMessage {
@@ -35,7 +36,7 @@ interface RoomJoinRequest {
 interface RoomJoinResponse {
     type: 'ROOM_JOINED';
     payload: {
-        room: Room;
+        room: ChatRoom;
     }
 }
 

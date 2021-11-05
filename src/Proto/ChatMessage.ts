@@ -1,18 +1,17 @@
-import { Message } from '../Model/Message';
-import { User } from '../Model/User';
+import ChatUser from './Model/ChatUser';
 
 //sv -> ALL cl in RoomID
 interface UserJoined {
     type: 'USER_JOINED';
     payload: {
-        user: User;
+        user: ChatUser;
     }
 }
 //sv -> all members in room
 interface UserDisconected {
     type: 'USER_DISCONECTED';
     payload: {
-        user: User;
+        user: ChatUser;
     }
 }
 //cl -> sv 
@@ -28,7 +27,7 @@ interface MessageSent {
 interface MessageRecieved {
     type: 'MESSAGE_RECIEVED';
     payload: {
-        message: Message;
+        message: ChatMessage;
     }
 }
 

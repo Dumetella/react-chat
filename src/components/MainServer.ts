@@ -3,15 +3,15 @@ import { v4 } from 'uuid';
 import WebSocket, { Server } from 'ws';
 import { ConnectionState } from '../Enum/ConnectionState';
 import log4js from 'log4js';
-import { User } from '../Model/User';
 import ChatManager from './ChatManager';
 import Client from './Client';
 import SocketMessage from '../Proto/SocketMessage';
 import SysMessage from '../Proto/SysMessage';
+import { database } from './DataBase';
 
-class GameServer {
+class MainServer {
     private port: number;
-    private db: [];
+    private db: database;
     private socket: Server;
     private logger: log4js.Logger;
 
@@ -27,9 +27,9 @@ class GameServer {
 
     private chatManager: ChatManager;
 
-    constructor(port: number, database) {
+    constructor(port: number, db: database) {
         this.port = port;
-        this.db = database;
+        this.db = db;
         this.clients = {};
         this.loggedIn = [];
         this.logger = log4js.getLogger('ChatServer');
@@ -92,7 +92,7 @@ class GameServer {
 
     private async DispatchSystemMessage(cl: Client, msg: SysMessage): Promise<void> {
         switch (msg.type) {
-            case 'JOIN_ROOM':
+            case 'LOGIN_REQUEST':
                 cl.Send({
                     type: 'SYS',
                     payload: {
@@ -103,49 +103,17 @@ class GameServer {
                     }
                 });
                 break;
-            case 'LOGIN_REQUEST':
-                if (await this.canLogin(cl, msg.id)) {
-                    await this.login(cl, msg.id, msg.name);
-                }
-                break;
-            case 'ds'
-                cl.State = ConnectionState.Disconnected;
-                this.logger.info('_', cl.Id, 'Disconnected with message', msg.reason);
-                // Notify other clients?
-                cl.Close();
-                break;
             default:
                 break;
         }
     }
 
 
-    private async login(cl: Client, loginId: string, name: string): Promise<void> {
-        cl.State = ConnectionState.LoggedIn;
-        this.loggedIn.push(loginId);
 
-        let userEnt = await this.db.TryGetUser(loginId);
-        if (!userEnt) {
-            userEnt = await this.db.AddUser(loginId, {});
-        }
-
-        this.logger.info('[LOGIN]', cl.Id, 'logged in with (private, public)', loginId, userEnt.publicId);
-        cl.User = new User(userEnt.publicId, name);
-        await cl.Send({
-            type: 'sys',
-            msg: {
-                type: 'login-response',
-                success: true,
-                user: {
-                    id: userEnt.publicId,
-                },
-            },
-        });
-    }
 }
 
 interface ClientCollection {
     [id: string]: Client
 }
 
-export default GameServer;
+export default MainServer;

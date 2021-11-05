@@ -2,7 +2,7 @@ import EventEmitter from 'events';
 import WebSocket from 'ws';
 import { ConnectionState } from '../Enum/ConnectionState';
 import log4js from 'log4js';
-import { User } from '../Model/User';
+import User from '../Model/User';
 import ChatMessage from '../Proto/ChatMessage';
 import SocketMessage from '../Proto/SocketMessage';
 

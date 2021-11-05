@@ -1,0 +1,5 @@
+class database {
+
+};
+
+export { database };
