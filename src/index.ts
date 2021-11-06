@@ -3,6 +3,8 @@ import config from './config.js';
 import Logger from 'log4js';
 import { WebSocketServer } from 'ws';
 import { Server } from 'http';
+import MainServer from './components/MainServer.js';
+import { database } from './components/DataBase.js';
 
 
 async function main(): Promise<void> {
@@ -25,15 +27,13 @@ async function main(): Promise<void> {
     //headless ws server
     const wss = new WebSocketServer({ server: http });
 
-    wss.on('connection', socket => {
+    //db
 
-        logger.info('Someone connected');
+    const db = new database();
 
+    const mainserver = new MainServer(wss, db);
 
-        socket.on('message', (message) => {
-            logger.info('Ok');
-        });
-    });
+    mainserver.Listen();
 
     // proper shutdown on Ctrl+C and kill
     const onProcessSignal = async (signal: NodeJS.Signals) => {
@@ -41,6 +41,12 @@ async function main(): Promise<void> {
         await new Promise<void>((r) => http.close((err) => {
             if (err) {
                 console.log('Server fail?', err);
+            }
+            r();
+        }));
+        await new Promise<void>((r) => wss.close((err) => {
+            if (err) {
+                console.log('???', err);
             }
             r();
         }));

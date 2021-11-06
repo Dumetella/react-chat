@@ -1,10 +1,10 @@
 import EventEmitter from 'events';
 import WebSocket from 'ws';
-import { ConnectionState } from '../Enum/ConnectionState';
+import { ConnectionState } from '../Enum/ConnectionState.js';
 import log4js from 'log4js';
-import User from '../Model/User';
-import ChatMessage from '../Proto/ChatMessage';
-import SocketMessage from '../Proto/SocketMessage';
+import User from '../Model/User.js';
+import ChatMessage from '../Proto/ChatMessage.js';
+import SocketMessage from '../Proto/SocketMessage.js';
 
 class Client extends EventEmitter {
     public State: ConnectionState;
@@ -58,7 +58,7 @@ class Client extends EventEmitter {
             const msg = JSON.parse(data.toString());
             this.dispatchMessage(msg);
         } catch (e) {
-            this.logger.error('Invalid data from socket', this.id, data);
+            this.logger.error('Invalid data from socket', this.id, data.toString());
         }
     }
 

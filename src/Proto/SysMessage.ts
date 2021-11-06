@@ -1,46 +1,29 @@
 import ChatRoom from './Model/ChatRoom';
 
-
 //cl -> sv
-interface LoginRequestMessage {
-    type: 'LOGIN_REQUEST';
+interface RoomJoinRequest {
+    type: 'ROOM_JOIN';
     payload: {
         name: string;
         roomId: string;
     }
 }
-
 //sv -> cl
-interface LoginRequestGranted {
-    type: 'LOGIN_GRANTED';
-    payload: {
-        response: 'OK';
-    }
-}
-
-//sv -> cl
-interface LoginRequestDeclined {
-    type: 'LOGIN_DECLINED';
-    payload: {
-        response: 'NO';
-    }
-}
-//cl -> sv
-interface RoomJoinRequest {
-    type: 'JOIN_ROOM';
-    payload: {
-        roomId: string;
-    }
-}
-//sv -> cl
-interface RoomJoinResponse {
-    type: 'ROOM_JOINED';
+interface RoomJoinGranted {
+    type: 'ROOM_GRANTED';
     payload: {
         room: ChatRoom;
     }
 }
 
-type SysMessage = LoginRequestMessage | LoginRequestGranted | LoginRequestDeclined | RoomJoinRequest | RoomJoinResponse;
+interface RoomJoinDeclined {
+    type: 'ROOM_DECLINED';
+    payload: {
+        reason: '?'
+    }
+}
+
+type SysMessage = RoomJoinRequest | RoomJoinGranted | RoomJoinDeclined;
 
 export default SysMessage;
 

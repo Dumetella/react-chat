@@ -1,16 +1,15 @@
 import { IncomingMessage } from 'http';
 import { v4 } from 'uuid';
 import WebSocket, { Server } from 'ws';
-import { ConnectionState } from '../Enum/ConnectionState';
+import { ConnectionState } from '../Enum/ConnectionState.js';
 import log4js from 'log4js';
-import ChatManager from './ChatManager';
-import Client from './Client';
-import SocketMessage from '../Proto/SocketMessage';
-import SysMessage from '../Proto/SysMessage';
-import { database } from './DataBase';
+import ChatManager from './ChatManager.js';
+import Client from './Client.js';
+import SocketMessage from '../Proto/SocketMessage.js';
+import SysMessage from '../Proto/SysMessage.js';
+import { database } from './DataBase.js';
 
 class MainServer {
-    private port: number;
     private db: database;
     private socket: Server;
     private logger: log4js.Logger;
@@ -27,8 +26,8 @@ class MainServer {
 
     private chatManager: ChatManager;
 
-    constructor(port: number, db: database) {
-        this.port = port;
+    constructor(socket: WebSocket.Server, db: database) {
+        this.socket = socket;
         this.db = db;
         this.clients = {};
         this.loggedIn = [];
@@ -38,10 +37,6 @@ class MainServer {
     }
 
     public Listen(): void {
-        this.socket = new Server({
-            port: this.port
-        });
-
         this.socket.on('connection', (s, m) => this.OnClientConnected(s, m));
     }
 
@@ -92,13 +87,16 @@ class MainServer {
 
     private async DispatchSystemMessage(cl: Client, msg: SysMessage): Promise<void> {
         switch (msg.type) {
-            case 'LOGIN_REQUEST':
+            case 'ROOM_JOIN':
                 cl.Send({
                     type: 'SYS',
                     payload: {
-                        type: 'LOGIN_GRANTED',
+                        type: 'ROOM_GRANTED',
                         payload: {
-                            response: 'OK'
+                            room: {
+                                id: msg.payload.roomId,
+                                users: [{ name: msg.payload.name, id: '1' }]
+                            }
                         }
                     }
                 });

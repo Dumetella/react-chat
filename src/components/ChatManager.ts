@@ -1,7 +1,7 @@
 import log4js from 'log4js';
-import ChatMessage from '../Proto/ChatMessage';
-import ChatRoom from '../Proto/Model/ChatRoom';
-import Client from './Client';
+import ChatMessage from '../Proto/ChatMessage.js';
+import ChatRoom from '../Proto/Model/ChatRoom.js';
+import Client from './Client.js';
 
 
 class ChatManager {
