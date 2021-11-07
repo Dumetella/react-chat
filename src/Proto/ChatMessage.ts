@@ -1,5 +1,6 @@
 import ChatRoom from './Model/ChatRoom';
 import ChatUser from './Model/ChatUser';
+import { Message } from './Model/Message';
 
 //sv -> ALL cl in RoomID
 interface UserJoined {
@@ -28,7 +29,7 @@ interface MessageSent {
 interface MessageRecieved {
     type: 'MESSAGE_RECIEVED';
     payload: {
-        message: ChatMessage;
+        message: Message;
     }
 }
 

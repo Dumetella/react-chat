@@ -1,9 +1,9 @@
 import ChatUser from './ChatUser';
 
-interface ChatMessage {
+interface Message {
     sender: ChatUser;
     date: string;
     text: string;
 };
 
-export { ChatMessage };
+export { Message };

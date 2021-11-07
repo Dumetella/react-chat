@@ -73,10 +73,10 @@ class MainServer {
                 this.DispatchSystemMessage(cl, msg.payload);
                 return;
             }
-            if (cl.State !== ConnectionState.LoggedIn) {
-                this.logger.info('?', cl.Id, 'User not logged in', msg);
-                return;
-            }
+            // if (cl.State !== ConnectionState.LoggedIn) {
+            //     this.logger.info('?', cl.Id, 'User not logged in', msg);
+            //     return;
+            // }
             if (msg.type === 'CHAT') {
                 await this.chatManager.DispatchMessage(cl, msg.payload);
             }

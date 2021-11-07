@@ -1,4 +1,5 @@
 import log4js from 'log4js';
+import User from '../Model/User.js';
 import ChatMessage from '../Proto/ChatMessage.js';
 import Client from './Client.js';
 
@@ -6,66 +7,126 @@ import Client from './Client.js';
 class ChatManager {
     private rooms: ChatRoom[];
     private lastChatId: number;
+    private lastUserId: number;
     private logger: log4js.Logger;
     constructor() {
         this.rooms = [];
         this.lastChatId = 1;
+        this.lastUserId = 1;
+
         this.logger = log4js.getLogger('ChatManager');
     }
 
     public async DispatchMessage(cl: Client, msg: ChatMessage): Promise<void> {
         switch (msg.type) {
-
+            case 'ROOM_JOIN':
+                await this.joinRoom(cl, msg.payload.name, msg.payload.roomId);
+                break;
+            case 'MESSAGE_SENT':
+                await this.transferMessage(cl, msg.payload.text);
+                break;
             default:
                 break;
         }
     }
+    async transferMessage(cl: Client, text: string): Promise<void> {
+        const r = this.rooms.find(c => c.users.some(e => e.User.Id === cl.User.Id));
+        if (!r) {
+            return;
+        }
+        await this.broadcast(r, {
+            type: 'MESSAGE_RECIEVED',
+            payload: {
+                message: {
+                    date: new Date().toString(),
+                    sender: {
+                        id: cl.User.Id,
+                        name: cl.User.Name
+                    },
+                    text: text
+                }
+            }
+        });
+    }
 
     public async OnClientDisconnected(cl: Client): Promise<void> {
+        if (!cl.User) {
+            return;
+        }
         const tasks = this.rooms
             .filter(room => room.users.some(u => u.User.Id === cl.User.Id))
             .map(room => this.leaveRoom(cl, room.id));
         await Promise.all(tasks);
     }
 
-    private async createRoom(cl: Client, name: string): Promise<void> {
+    private createRoom(cl: Client, name: string): ChatRoom {
         const r: ChatRoom = {
             id: (this.lastChatId++).toString(),
             name,
-            users: [cl],
+            users: [],
         };
         this.rooms.push(r);
+        return r;
     }
 
-    private async joinRoom(cl: Client, id: string): Promise<void> {
+    private async joinRoom(cl: Client, name: string, roomId: string): Promise<void> {
 
-        id = id.substring(1);
+        cl.User = new User((this.lastUserId++).toString(), name);
+        const room = this.rooms.find(c => c.id === roomId) || this.createRoom(cl, name);
 
-        const room = this.rooms.find(c => c.id === id);
-
-        if (!room) {
-            this.createRoom(cl, name)
-        }
-
-        room.users.push(cl);
         await this.broadcast(room, {
-            type: 'joined',
-            to: id,
-            user: {
-                id: cl.User.Id,
-                name: cl.User.Name,
+            type: 'USER_JOINED',
+            payload: {
+                user: {
+                    id: cl.User.Id,
+                    name: cl.User.Name
+                }
+            }
+        });
+        room.users.push(cl);
+        cl.Send({
+            type: 'CHAT',
+            payload: {
+                type: 'ROOM_GRANTED',
+                payload: {
+                    room: {
+                        id: room.id,
+                        users: room.users.map(c => {
+                            return {
+                                id: c.User.Id,
+                                name: c.User.Name
+                            };
+                        })
+                    }
+                }
             }
         });
     }
 
     private async leaveRoom(cl: Client, id: string): Promise<void> {
-        this.logger.info('zhopa');
+        const r = this.rooms.find(c => c.id === id);
+        if (!r) {
+            return;
+        }
+        if (!r.users.some(c => c.User.Id === cl.User.Id)) {
+            return;
+        }
+        r.users = r.users.filter(c => c.User.Id !== cl.User.Id);
+        await this.broadcast(r, {
+            type: 'USER_DISCONECTED',
+            payload: {
+                user: {
+                    id: cl.User.Id,
+                    name: cl.User.Name,
+                }
+            }
+        });
     }
 
     private async broadcast(room: ChatRoom, msg: ChatMessage): Promise<void> {
         await Promise.all(room.users.map(c => c.Send({
             type: 'CHAT',
-            payload: 
+            payload: msg
         })));
     }
 }
@@ -78,18 +139,3 @@ interface ChatRoom {
 }
 
 export default ChatManager;
-
-
-// case 'ROOM_JOIN':
-//                 cl.Send({
-//                     type: 'SYS',
-//                     payload: {
-//                         type: 'ROOM_GRANTED',
-//                         payload: {
-//                             room: {
-//                                 id: msg.payload.roomId,
-//                                 users: [{ name: msg.payload.name, id: '1' }]
-//                             }
-//                         }
-//                     }
-//                 });

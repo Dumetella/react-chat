@@ -59,6 +59,7 @@ async function main(): Promise<void> {
                 r();
             });
         });
+        process.exit(0);
     };
     process.on('SIGTERM', onProcessSignal);
     process.on('SIGINT', onProcessSignal);
