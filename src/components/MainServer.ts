@@ -86,21 +86,8 @@ class MainServer {
     }
 
     private async DispatchSystemMessage(cl: Client, msg: SysMessage): Promise<void> {
-        switch (msg.type) {
-            case 'ROOM_JOIN':
-                cl.Send({
-                    type: 'SYS',
-                    payload: {
-                        type: 'ROOM_GRANTED',
-                        payload: {
-                            room: {
-                                id: msg.payload.roomId,
-                                users: [{ name: msg.payload.name, id: '1' }]
-                            }
-                        }
-                    }
-                });
-                break;
+        switch (msg) {
+
             default:
                 break;
         }

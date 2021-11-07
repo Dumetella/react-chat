@@ -1,3 +1,4 @@
+import ChatRoom from './Model/ChatRoom';
 import ChatUser from './Model/ChatUser';
 
 //sv -> ALL cl in RoomID
@@ -31,8 +32,31 @@ interface MessageRecieved {
     }
 }
 
+//cl -> sv
+interface RoomJoinRequest {
+    type: 'ROOM_JOIN';
+    payload: {
+        name: string;
+        roomId: string;
+    }
+}
+//sv -> cl
+interface RoomJoinGranted {
+    type: 'ROOM_GRANTED';
+    payload: {
+        room: ChatRoom;
+    }
+}
+
+interface RoomJoinDeclined {
+    type: 'ROOM_DECLINED';
+    payload: {
+        reason: '?'
+    }
+}
+
 
 type ChatMessage =
-    UserJoined | MessageRecieved | MessageSent | UserDisconected;
+    UserJoined | MessageRecieved | MessageSent | UserDisconected | RoomJoinRequest | RoomJoinGranted | RoomJoinDeclined;
 
 export default ChatMessage;
