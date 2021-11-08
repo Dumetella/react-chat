@@ -2,7 +2,7 @@ import ChatUser from './ChatUser';
 
 interface Message {
     sender: ChatUser;
-    date: string;
+    date: Date;
     text: string;
 };
 

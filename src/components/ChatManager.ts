@@ -38,7 +38,7 @@ class ChatManager {
             type: 'MESSAGE_RECIEVED',
             payload: {
                 message: {
-                    date: new Date().toString(),
+                    date: new Date(),
                     sender: {
                         id: cl.User.Id,
                         name: cl.User.Name
