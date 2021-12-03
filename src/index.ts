@@ -18,7 +18,7 @@ async function main(): Promise<void> {
 
     const http = new Server();
 
-    http.listen(config.get().LISTEN_PORT);
+    http.listen(process.env.PORT || config.get().LISTEN_PORT);
     http.on('listening', () => {
         logger.info(`Server listening on ${config.get().LISTEN_PORT}`);
     });
