@@ -1,0 +1,4 @@
+{
+    "LISTEN_PORT": 32280,
+    "WWW_ROOT": "./static"
+}

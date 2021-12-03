@@ -29,5 +29,3 @@ build/
 .DS_Store
 
 # User's
-config.json
-static/

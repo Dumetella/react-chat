@@ -6,12 +6,10 @@ import Client from './Client.js';
 
 class ChatManager {
     private rooms: ChatRoom[];
-    private lastChatId: number;
     private lastUserId: number;
     private logger: log4js.Logger;
     constructor() {
         this.rooms = [];
-        this.lastChatId = 1;
         this.lastUserId = 1;
 
         this.logger = log4js.getLogger('ChatManager');
@@ -59,20 +57,19 @@ class ChatManager {
         await Promise.all(tasks);
     }
 
-    private createRoom(cl: Client, name: string): ChatRoom {
+    private createRoom(cl: Client, roomId: string): ChatRoom {
         const r: ChatRoom = {
-            id: (this.lastChatId++).toString(),
-            name,
+            id: roomId,
             users: [],
         };
         this.rooms.push(r);
         return r;
     }
 
-    private async joinRoom(cl: Client, name: string, roomId: string): Promise<void> {
-
+    private async joinRoom(cl: Client, name: string, id: string): Promise<void> {
+        const roomId = id.toLowerCase().trim();
         cl.User = new User((this.lastUserId++).toString(), name);
-        const room = this.rooms.find(c => c.id === roomId) || this.createRoom(cl, name);
+        const room = this.rooms.find(c => c.id === roomId) || this.createRoom(cl, roomId);
 
         await this.broadcast(room, {
             type: 'USER_JOINED',
@@ -133,7 +130,6 @@ class ChatManager {
 
 interface ChatRoom {
     id: string
-    name: string
     // references to Client
     users: Client[]
 }
