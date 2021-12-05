@@ -46,6 +46,7 @@ interface RoomJoinGranted {
     type: 'ROOM_GRANTED';
     payload: {
         room: ChatRoom;
+        userName: string;
     }
 }
 

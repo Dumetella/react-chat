@@ -94,7 +94,8 @@ class ChatManager {
                                 name: c.User.Name
                             };
                         })
-                    }
+                    },
+                    userName: cl.User.Name
                 }
             }
         });
